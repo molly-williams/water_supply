@@ -1,0 +1,336 @@
+---
+title: "decadal analysis"
+author: "Molly Williams"
+date: "7/17/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Load data and packages
+```{r}
+library(tidyverse)
+library(here)
+library(ggpubr)
+library(gridExtra)
+
+# Exports
+d_hist <- read_csv(here("/metrics by decade/Exports/Hist.csv")) %>% 
+  select(DeltaExports, Period) %>% 
+  mutate(Period = "2000")
+#  mutate(DeltaExports=DeltaExports/1000000)
+
+d_2010 <- read_csv(here("/metrics by decade/Exports/2010.csv")) %>% 
+  select(DeltaExports, Period) %>% 
+  mutate(Period = "2010")
+
+d_2020 <- read_csv(here("/metrics by decade/Exports/2020.csv")) %>% 
+  select(DeltaExports, Period) %>% 
+  mutate(Period = "2020")
+
+d_2030 <- read_csv(here("/metrics by decade/Exports/2030.csv")) %>% 
+  select(DeltaExports, Period) %>% 
+  mutate(Period = "2030")
+
+d_2040 <- read_csv(here("/metrics by decade/Exports/2040.csv")) %>% 
+  select(DeltaExports, Period) %>% 
+  mutate(Period = "2040")
+
+d_2050 <- read_csv(here("/metrics by decade/Exports/2050.csv")) %>% 
+  select(DeltaExports, Period) %>% 
+  mutate(Period = "2050")
+
+d_2060 <- read_csv(here("/metrics by decade/Exports/2060.csv")) %>% 
+  select(DeltaExports, Period) %>% 
+  mutate(Period = "2060")
+
+
+d_combined <- rbind(d_hist, d_2010, d_2020, d_2030, d_2040, d_2050, d_2060)
+
+
+# NOD April
+NODa_hist <- read_csv(here("/metrics by decade/NODApril/Hist.csv")) %>% 
+  select(Storage = "NOD End of April Storage", Period) %>% 
+  mutate(Period = "2000")
+
+NODa_2010 <- read_csv(here("/metrics by decade/NODApril/2010.csv")) %>% 
+  select(Storage = "NOD End of April Storage", Period) %>% 
+  mutate(Period = "2010")
+
+NODa_2020 <- read_csv(here("/metrics by decade/NODApril/2020.csv")) %>% 
+  select(Storage = "NOD End of April Storage", Period) %>% 
+  mutate(Period = "2020")
+
+NODa_2030 <- read_csv(here("/metrics by decade/NODApril/2030.csv")) %>% 
+  select(Storage = "NOD End of April Storage", Period) %>% 
+  mutate(Period = "2030")
+
+NODa_2040 <- read_csv(here("/metrics by decade/NODApril/2040.csv")) %>% 
+  select(Storage = "NOD End of April Storage", Period) %>% 
+  mutate(Period = "2040")
+
+NODa_2050 <- read_csv(here("/metrics by decade/NODApril/2050.csv")) %>% 
+  select(Storage = "NOD End of April Storage", Period) %>% 
+  mutate(Period = "2050")
+
+NODa_2060 <- read_csv(here("/metrics by decade/NODApril/2060.csv")) %>% 
+  select(Storage = "NOD End of April Storage", Period) %>% 
+  mutate(Period = "2060")
+
+
+NODa_combined <- rbind(NODa_hist, NODa_2010, NODa_2020, NODa_2030, NODa_2040, NODa_2050, NODa_2060)
+
+
+
+# NOD Carryover
+NODc_hist <- read_csv(here("/metrics by decade/NODCarryover/Hist.csv")) %>% 
+  select(Storage = "NOD Carryover Storage", Period) %>% 
+  mutate(Period = "2000")
+
+NODc_2010 <- read_csv(here("/metrics by decade/NODCarryover/2010.csv")) %>% 
+  select(Storage = "NOD Carryover Storage", Period) %>% 
+  mutate(Period = "2010")
+
+NODc_2020 <- read_csv(here("/metrics by decade/NODCarryover/2020.csv")) %>% 
+  select(Storage = "NOD Carryover Storage", Period) %>% 
+  mutate(Period = "2020")
+
+NODc_2030 <- read_csv(here("/metrics by decade/NODCarryover/2030.csv")) %>% 
+  select(Storage = "NOD Carryover Storage", Period) %>% 
+  mutate(Period = "2030")
+
+NODc_2040 <- read_csv(here("/metrics by decade/NODCarryover/2040.csv")) %>% 
+  select(Storage = "NOD Carryover Storage", Period) %>% 
+  mutate(Period = "2040")
+
+NODc_2050 <- read_csv(here("/metrics by decade/NODCarryover/2050.csv")) %>% 
+  select(Storage = "NOD Carryover Storage", Period) %>% 
+  mutate(Period = "2050")
+
+NODc_2060 <- read_csv(here("/metrics by decade/NODCarryover/2060.csv")) %>% 
+  select(Storage = "NOD Carryover Storage", Period) %>% 
+  mutate(Period = "2060")
+
+
+NODc_combined <- rbind(NODc_hist, NODc_2010, NODc_2020, NODc_2030, NODc_2040, NODc_2050, NODc_2060)
+
+
+# Shortages
+shortage_hist <- read_csv(here("/metrics by decade/Shortages/Hist.csv")) %>% 
+  select(Shortage = "System Shortages", Period) %>% 
+  mutate(Period = "2000") %>% 
+  mutate(Shortage = Shortage/1000) # convert from TAF (native unit) to MAF (matches other metrics)
+
+shortage_2010 <- read_csv(here("/metrics by decade/Shortages/2010.csv")) %>% 
+  select(Shortage = "System Shortages", Period) %>% 
+  mutate(Period = "2010") %>% 
+  mutate(Shortage = Shortage/1000) # convert from TAF (native unit) to MAF (matches other metrics)
+
+shortage_2020 <- read_csv(here("/metrics by decade/Shortages/2020.csv")) %>% 
+  select(Shortage = "System Shortages", Period) %>% 
+  mutate(Period = "2020")  %>% 
+  mutate(Shortage = Shortage/1000) # convert from TAF (native unit) to MAF (matches other metrics)
+
+shortage_2030 <- read_csv(here("/metrics by decade/Shortages/2030.csv")) %>% 
+  select(Shortage = "System Shortages", Period) %>% 
+  mutate(Period = "2030")  %>% 
+  mutate(Shortage = Shortage/1000) # convert from TAF (native unit) to MAF (matches other metrics)
+
+shortage_2040 <- read_csv(here("/metrics by decade/Shortages/2040.csv")) %>% 
+  select(Shortage = "System Shortages", Period) %>% 
+  mutate(Period = "2040")  %>% 
+  mutate(Shortage = Shortage/1000) # convert from TAF (native unit) to MAF (matches other metrics)
+
+shortage_2050 <- read_csv(here("/metrics by decade/Shortages/2050.csv")) %>% 
+  select(Shortage = "System Shortages", Period) %>% 
+  mutate(Period = "2050")  %>% 
+  mutate(Shortage = Shortage/1000) # convert from TAF (native unit) to MAF (matches other metrics)
+
+shortage_2060 <- read_csv(here("/metrics by decade/Shortages/2060.csv")) %>% 
+  select(Shortage = "System Shortages", Period) %>% 
+  mutate(Period = "2060")  %>% 
+  mutate(Shortage = Shortage/1000) # convert from TAF (native unit) to MAF (matches other metrics)
+
+
+shortage_combined <- rbind(shortage_hist, shortage_2010, shortage_2020, shortage_2030, shortage_2040, shortage_2050, shortage_2060)
+
+
+```
+
+
+# Violin plots by decade
+
+```{r}
+
+# Delta Exports 
+
+d_cf <- coef(lm(DeltaExports ~ as.numeric(factor(Period)), d_combined))
+
+ggplot(d_combined, aes(x=factor(Period), y=DeltaExports, fill=factor(Period))) + 
+  geom_violin(trim=FALSE) + 
+  geom_boxplot(width=0.1, fill = "white") +
+  labs(title="Delta Exports",x="Decade", y = "Delta Exports (MAF)") +
+  scale_fill_brewer(palette="BuPu") + 
+  theme_classic() +
+  theme(legend.position = "none") + 
+  geom_abline(slope=d_cf[2], intercept=d_cf[1], lwd=0.7) +
+  ggsave("figures/dexports_decadal_violins.png")
+
+
+# NOD April
+
+NODa_cf <- coef(lm(Storage ~ as.numeric(factor(Period)), NODa_combined))
+
+ggplot(NODa_combined, aes(x=factor(Period), y=Storage, fill=factor(Period))) + 
+  geom_violin(trim=FALSE) + 
+  geom_boxplot(width=0.1, fill = "white") +
+  labs(title="NOD End of April Storage",x="Decade", y = "Storage Volume (MAF)") +
+  scale_fill_brewer(palette="BuPu") + 
+  theme_classic() +
+  theme(legend.position = "none") + 
+  geom_abline(slope=NODa_cf[2], intercept=NODa_cf[1], lwd=0.7) +
+  ggsave("figures/NODa_decadal_violins.png")
+
+
+# NOD Carryover
+
+NODc_cf <- coef(lm(Storage ~ as.numeric(factor(Period)), NODc_combined))
+
+ggplot(NODc_combined, aes(x=factor(Period), y=Storage, fill=factor(Period))) + 
+  geom_violin(trim=FALSE) + 
+  geom_boxplot(width=0.1, fill = "white") +
+  labs(title="NOD Carryover Storage",x="Decade", y = "Storage Volume (MAF)") +
+  scale_fill_brewer(palette="BuPu") + 
+  theme_classic() +
+  theme(legend.position = "none") + 
+  geom_abline(slope=NODc_cf[2], intercept=NODc_cf[1], lwd=0.7) +
+  ggsave("figures/NODc_decadal_violins.png")
+
+
+# Shortages
+
+
+shortage_combined <- shortage_combined %>% 
+  filter(Shortage>0.05)
+
+shortage_cf <- coef(lm(Shortage ~ as.numeric(factor(Period)), shortage_combined))
+
+
+ggplot(shortage_combined, aes(x=factor(Period), y=Shortage, fill=factor(Period))) + 
+  geom_violin(trim=FALSE) + 
+  geom_boxplot(width=0.1, fill = "white") +
+  labs(title="System Shortages",x="Decade", y = "Constraint Relaxations (MAF)") +
+  scale_fill_brewer(palette="BuPu") + 
+  theme_classic() +
+  theme(legend.position = "none") + 
+  geom_abline(slope=shortage_cf[2], intercept=shortage_cf[1], lwd=0.7) +
+ scale_y_continuous(trans="log10") +
+  ggsave("figures/shortage_decadal_violins.png")
+
+```
+
+
+
+
+# Updating figures based on new RDS file (30 Jul)
+
+
+```{r}
+
+# NOD April
+
+NODa <- read_csv(here("Data/rds_NODa.csv")) %>% 
+  select(Water_Year=Metric, T_lev, Prcp_lev, Storage=NOD_STORAGE) %>% 
+    filter(Water_Year != "NA",
+         T_lev != "NA",
+         Prcp_lev != "NA", 
+         Storage != "NA") %>% 
+  mutate(Storage = Storage/1000)# convert to MAF 
+
+NODa_temp <- NODa %>% 
+  filter(Prcp_lev == 0) %>% 
+  select(Water_Year, T_lev, Storage)
+
+
+NODa_prcp <- NODa %>% 
+  filter(T_lev == 0) %>% 
+  select(Water_Year, Prcp_lev, Storage)
+
+
+# NOD September
+
+NODc <- read_csv(here("Data/rds_NODc.csv")) %>% 
+  select(Water_Year=Metric, T_lev, Prcp_lev, Storage=NOD_STORAGE) %>% 
+    filter(Water_Year != "NA",
+         T_lev != "NA",
+         Prcp_lev != "NA", 
+         Storage != "NA") %>% 
+  mutate(Storage = Storage/1000)# convert to MAF 
+
+NODc_temp <- NODc %>% 
+  filter(Prcp_lev == 0) %>% 
+  select(Water_Year, T_lev, Storage)
+
+
+NODc_prcp <- NODc %>% 
+  filter(T_lev == 0) %>% 
+  select(Water_Year, Prcp_lev, Storage)
+
+
+# Delta Exports
+
+dexports <- read_csv(here("Data/rds_dexports.csv")) %>% 
+  select(Water_Year, T_lev, Prcp_lev, Exports=DELTA_EXPORTS) %>% 
+    filter(Water_Year != "NA",
+         T_lev != "NA",
+         Prcp_lev != "NA", 
+         Exports != "NA") %>% 
+  mutate(Exports = Exports/1000000)# convert to MAF 
+
+dexports_temp <- dexports %>% 
+  filter(Prcp_lev == 0) %>% 
+  select(Water_Year, T_lev, Exports)
+
+
+dexports_prcp <- dexports %>% 
+  filter(T_lev == 0) %>% 
+  select(Water_Year, Prcp_lev, Exports)
+
+
+
+# Shortages
+
+shortages <- read_csv(here("Data/rds_shortages.csv")) %>% 
+  select(Water_Year, T_lev, Prcp_lev, Shortage= SHORTAGE) %>% 
+    filter(Water_Year != "NA",
+         T_lev != "NA",
+         Prcp_lev != "NA", 
+         Shortage != "NA") %>% 
+  mutate(Shortage = Shortage/1000000)# convert to MAF 
+
+shortage_temp <- shortages %>% 
+  filter(Prcp_lev == 0) %>% 
+  select(Water_Year, T_lev, Shortage)
+
+
+shortage_prcp <- shortages %>% 
+  filter(T_lev == 0) %>% 
+  select(Water_Year, Prcp_lev, Shortage)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
